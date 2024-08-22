@@ -63,6 +63,23 @@ flutter:
     - assets/unselected circle.png
     - assets/selected circle.png
     - assets/balance-board.png
+    - assets/results-board.png
+    - assets/diamond-frame-blue.png
+    - assets/bacground-music-btn.png
+    - assets/win-history-btn.png
+    - assets/more-menu-btn.png
+    - assets/coin.png
+    - assets/food items/tomato.png
+    - assets/food items/corn.png
+    - assets/food items/beef.png
+    - assets/food items/cabbage.png
+    - assets/food items/carrot.png
+    - assets/food items/hot-dog.png
+    - assets/food items/leg-piece.png
+    - assets/food items/tuna.png
+    - assets/food items/pizza.png
+    - assets/food items/salard.png
+
 
   # To add assets to your application, add an assets section, like this:
   # assets:
