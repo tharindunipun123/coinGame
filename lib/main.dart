@@ -24,11 +24,11 @@ void main() {
 
   int Balance = 0;
   int WinAmount = 0;
+  int Time = 30;
 
   void getBalance(){
 
   }
-
 
   void setSelectedImage(int number){
     int imgNumber = number;
@@ -76,7 +76,6 @@ void main() {
                 fit: BoxFit.cover,
               ),
             ),
-
 
             child: Stack(
               children: [
@@ -136,6 +135,17 @@ void main() {
                   ),
                 ),
 
+                Positioned(
+                    top: 276,
+                    left: 165,
+                    child: Text('please bet' , style: TextStyle(fontWeight: FontWeight.bold , color: Colors.black , fontSize: 12),)
+                ),
+                Positioned(
+                    top: 290,
+                    left: 180,
+                    child: Text('$Time' , style: TextStyle(fontWeight: FontWeight.bold , color: Colors.black , fontSize: 24),)
+                ),
+
                 //first circle
                 Positioned(
                   top: 115,
@@ -180,6 +190,7 @@ void main() {
                   ),
                 ),
                 ),
+                
                 Positioned(
                   top: 160,
                   left: 267,
