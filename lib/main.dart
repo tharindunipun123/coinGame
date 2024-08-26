@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 void main() {
@@ -22,19 +24,109 @@ void main() {
   String seventhCircle = 'assets/unselected circle.png';
   String eightCircle = 'assets/unselected circle.png';
 
-  int Balance = 0;
+  @override
+  void initState() {
+    super.initState();
+    timeCount(); // Start the timer when the app starts
+  }
+
+  bool gameisActive = false;
+  int selectedCircle = 0;
+  int Balance = 1000;
   int WinAmount = 0;
   int Time = 30;
+  int GameTime = 5;
+  int outComeNumber = 6;
+  int lastSelectedcircle = 0;
+  // List<int> selectedCircleList = [];
+  // List<int> betamount = [];
 
-  void getBalance(){
+  List<List<int>> oneByOneArray = [
+    []
+  ];
+
+  void bettingamount(int betAmount) {
+    if (betAmount <= Balance) {
+      bool found = false;
+
+      // Iterate over the array to find if the last selected circle already exists
+      for (int i = 0; i < oneByOneArray.length; i++) {
+        if (oneByOneArray[i].isNotEmpty && oneByOneArray[i][0] == lastSelectedcircle) {
+          oneByOneArray[i][1] += betAmount; // Add the bet amount to the existing value
+          found = true;
+          break;
+        }
+      }
+
+      if (!found) {
+        // If the circle is not found, add a new pair [circleNumber, betAmount]
+        oneByOneArray.add([lastSelectedcircle, betAmount]);
+      }
+       setState((){
+        Balance -= betAmount;});
+      // Deduct the bet amount from the balance
+
+
+      print('Updated array: $oneByOneArray');
+      print('Remaining balance: $Balance');
+    } else {
+      print("Insufficient balance");
+    }
+  }
+
+  void runGameTime (){
+    for (int i = 0; i < oneByOneArray.length; i++){
+      if (oneByOneArray[i].isNotEmpty && oneByOneArray[i][0] == outComeNumber) {
+       int tempWinAmount =oneByOneArray[i][1];
+       setState(() {
+         WinAmount = tempWinAmount*5;
+         Balance += WinAmount;
+       });
+       // Add the bet amount to the existing value
+        break;
+      }
+
+    }
+    gameisActive = true;
+ // in this moment userCant bet to any circle
+    Timer.periodic(Duration(seconds: 1), (timer) {
+      setState(() {
+        if (Time > 0) {
+          Time--;
+        } else {
+          Time = 30;
+          GameTime = 5;
+          gameisActive =false;
+          timer.cancel();
+          timeCount();
+      }});
+    });
+  }
+
+  void timeCount (){
+    //user can bet 6 circle between 0 to 30 seconds timer
+    Timer.periodic(Duration(seconds: 1), (timer) {
+      setState(() {
+        if (Time > 0) {
+          Time--;
+        } else {
+          Time+=5;
+          timer.cancel();
+          runGameTime();
+        // Stop the timer when it reaches 0
+          // You can add any additional logic here when the timer ends
+        }
+      });
+    });
 
   }
 
   void setSelectedImage(int number){
+    selectedCircle++;
     int imgNumber = number;
-    setState(() {
-      bool gameisActive = false;
-      if (gameisActive == false) {
+    lastSelectedcircle = imgNumber;
+    if (gameisActive==false && selectedCircle <= 6 ) {
+      setState(() {
         if (imgNumber == 1) {
           firstCircle = imgSelected;
         }
@@ -60,12 +152,14 @@ void main() {
           eightCircle = imgSelected;
         }
       }
-    });
+      );
+    }
   }
 
    @override
    Widget build(BuildContext context) {
       return MaterialApp(
+
         debugShowCheckedModeBanner: false,
         home: Scaffold(
 
@@ -190,7 +284,7 @@ void main() {
                   ),
                 ),
                 ),
-                
+
                 Positioned(
                   top: 160,
                   left: 267,
@@ -450,11 +544,14 @@ void main() {
                   top: 545,
                   left: 50,
 
-                  child: Image.asset(
+                  child: GestureDetector(
+                    onTap: ()=>bettingamount(500) ,
+                    child: Image.asset(
                     'assets/diamond-frame-blue.png',
                     width: 60,
                     height:75,
 
+                  ),
                   ),
                 ),
 
@@ -477,11 +574,14 @@ void main() {
                   top: 545,
                   left: 123,
 
-                  child: Image.asset(
+                  child: GestureDetector(
+                    onTap: ()=>bettingamount(1000) ,
+                    child: Image.asset(
                     'assets/diamond-frame-blue.png',
                     width: 60,
                     height:75,
 
+                  ),
                   ),
                 ),
                 Positioned(
@@ -503,11 +603,15 @@ void main() {
                   top: 545,
                   left: 199,
 
+                  child: GestureDetector(
+                    onTap: ()=>bettingamount(5000) ,
                   child: Image.asset(
+
                     'assets/diamond-frame-blue.png',
                     width: 60,
                     height:75,
 
+                  ),
                   ),
                 ),
                 Positioned(
@@ -528,11 +632,13 @@ void main() {
                 Positioned(
                   top: 545,
                   left: 275,
-                  child: Image.asset(
+                  child: GestureDetector(
+                    onTap: ()=>bettingamount(10000) ,
+                    child: Image.asset(
                     'assets/diamond-frame-blue.png',
                     width: 60,
                     height:75,
-
+                  ),
                   ),
                 ),
                 Positioned(
@@ -569,7 +675,6 @@ void main() {
                     height:22,
                   ),
                 ),
-
 
                 Positioned(
                   top: 520,
