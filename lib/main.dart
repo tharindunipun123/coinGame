@@ -1,18 +1,31 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:audioplayers/audioplayers.dart';
+import 'leaderBoard.dart';
+import 'bet_history.dart';
 
 void main() {
   runApp(const MyApp());
 }
 
- class MyApp extends StatefulWidget {
+ class MyApp extends StatelessWidget {
    const MyApp({super.key});
    @override
-   State<MyApp> createState() => _MyAppState();
+   Widget build(BuildContext context) {
+     return MaterialApp(
+       debugShowCheckedModeBanner: false,
+       home: MainGameScreen(),
+     );
+   }
  }
 
- class _MyAppState extends State<MyApp> {
+class MainGameScreen extends StatefulWidget {
+  @override
+  _MainGameScreenState createState() => _MainGameScreenState();
+}
+
+ class  _MainGameScreenState extends State<MainGameScreen> {
   String imgUnselected = 'assets/unselected circle.png';
   String imgSelected = 'assets/selected circle.png';
   String firstCircle = 'assets/unselected circle.png';
@@ -23,11 +36,49 @@ void main() {
   String sixthCircle = 'assets/unselected circle.png';
   String seventhCircle = 'assets/unselected circle.png';
   String eightCircle = 'assets/unselected circle.png';
+   AudioPlayer _audioPlayer = AudioPlayer();
+  bool isPlaying = true;
+  double _scale = 1.0; // Default scale for the animation
+  Duration _animationDuration = const Duration(milliseconds: 100); // Duration of the animation
+  bool isProcessing = false;
 
   @override
   void initState() {
     super.initState();
+    _playMusic();
     timeCount(); // Start the timer when the app starts
+  }
+
+  Future<void> _playMusic() async {
+    await _audioPlayer.setSource(AssetSource('background-music.mp3')); // Set the source again
+    await _audioPlayer.resume(); // Resume the audio
+  }
+
+  Future<void> _stopMusic() async {
+    await _audioPlayer.stop();
+    await _audioPlayer.release(); // Release the player resources
+    _audioPlayer = AudioPlayer(); // Reinitialize the player
+  }
+
+  void _toggleMusic() async {
+    if (isProcessing) return; // Ignore if a toggle is already in progress
+    setState(() {
+      isProcessing = true;
+    });
+
+    if (isPlaying) {
+      await _stopMusic();
+    } else {
+      await _playMusic();
+    }
+
+    setState(() {
+      isPlaying = !isPlaying;
+      isProcessing = false;
+    });
+
+    // Trigger the animation
+    _animateButton();
   }
 
   bool gameisActive = false;
@@ -121,6 +172,19 @@ void main() {
 
   }
 
+  void _animateButton() {
+    setState(() {
+      _scale = 0.8; // Shrink the image
+    });
+
+    // Bring the image back to its original size after the animation duration
+    Future.delayed(_animationDuration, () {
+      setState(() {
+        _scale = 1.0;
+      });
+    });
+  }
+
   void setSelectedImage(int number){
     selectedCircle++;
     int imgNumber = number;
@@ -158,10 +222,7 @@ void main() {
 
    @override
    Widget build(BuildContext context) {
-      return MaterialApp(
-
-        debugShowCheckedModeBanner: false,
-        home: Scaffold(
+      return  Scaffold(
 
           body: Container(
             decoration: BoxDecoration(
@@ -177,12 +238,20 @@ void main() {
                 Positioned(
                   top: 36,
                   left: 10,
-
-                  child: Image.asset(
-                    'assets/win-history-btn.png',
-                    width: 50,
-                    height:35,
-
+                  child: GestureDetector(
+                    onTap: () {
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return LeaderBoard(); // Display the LeaderBoard screen as a dialog
+                        },
+                      );
+                    },
+                    child: Image.asset(
+                      'assets/win-history-btn.png',
+                      width: 50,
+                      height: 35,
+                    ),
                   ),
                 ),
 
@@ -190,12 +259,17 @@ void main() {
                 Positioned(
                   top: 36,
                   left: 65,
-
-                  child: Image.asset(
-                    'assets/bacground-music-btn.png',
-                    width: 50,
-                    height:35,
-
+                  child: GestureDetector(
+                    onTap: _toggleMusic,
+                    child: AnimatedScale(
+                      scale: _scale,
+                      duration: _animationDuration,
+                      child: Image.asset(
+                        'assets/bacground-music-btn.png',
+                        width: 50,
+                        height: 35,
+                      ),
+                    ),
                   ),
                 ),
                  // HEADING
@@ -207,15 +281,24 @@ void main() {
 
                 ),
                // MORE MENU BUTTON
+                // Bet history button
                 Positioned(
                   top: 36,
                   left: 280,
-
-                  child: Image.asset(
-                    'assets/more-menu-btn.png',
-                    width: 50,
-                    height:35,
-
+                  child: GestureDetector(
+                    onTap: () {
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return BetHistory(); // Display the LeaderBoard screen as a dialog
+                        },
+                      );
+                    },
+                    child: Image.asset(
+                      'assets/more-menu-btn.png',
+                      width: 50,
+                      height: 35,
+                    ),
                   ),
                 ),
 
@@ -559,7 +642,7 @@ void main() {
                   top: 560,
                   left: 60,
                   child: Image.asset(
-                    'assets/coin.png',
+                    'assets/diamond1.png',
                     width: 40,
                     height:22,
                   ),
@@ -588,7 +671,7 @@ void main() {
                   top: 560,
                   left: 133,
                   child: Image.asset(
-                    'assets/coin.png',
+                    'assets/diamond1.png',
                     width: 40,
                     height:22,
                   ),
@@ -618,7 +701,7 @@ void main() {
                   top: 560,
                   left: 209,
                   child: Image.asset(
-                    'assets/coin.png',
+                    'assets/diamond1.png',
                     width: 40,
                     height:22,
                   ),
@@ -660,7 +743,7 @@ void main() {
                   top: 767,
                   left: 119,
                   child: Image.asset(
-                    'assets/coin.png',
+                    'assets/diamond1.png',
                     width: 40,
                     height:22,
                   ),
@@ -704,8 +787,8 @@ void main() {
               ],
             ),
           ),
-        ),
-      );
+        );
+
     }
  }
 
