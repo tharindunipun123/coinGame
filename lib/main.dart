@@ -25,7 +25,7 @@ class MainGameScreen extends StatefulWidget {
   _MainGameScreenState createState() => _MainGameScreenState();
 }
 
- class  _MainGameScreenState extends State<MainGameScreen> {
+ class  _MainGameScreenState extends State<MainGameScreen> with SingleTickerProviderStateMixin{
   String imgUnselected = 'assets/unselected circle.png';
   String imgSelected = 'assets/selected circle.png';
   String firstCircle = 'assets/unselected circle.png';
@@ -42,12 +42,42 @@ class MainGameScreen extends StatefulWidget {
   Duration _animationDuration = const Duration(milliseconds: 100); // Duration of the animation
   bool isProcessing = false;
 
+  late AnimationController _controller;
+  late Animation<Offset> _animation;
+
   @override
   void initState() {
     super.initState();
     _playMusic();
-    timeCount(); // Start the timer when the app starts
+    timeCount();
+    // Initialize the animation controller and animation sequence
+    _controller = AnimationController(
+      duration: const Duration(seconds: 9),
+      vsync: this,
+    );
+
+    _animation = TweenSequence([
+      TweenSequenceItem(tween: Tween(begin: const Offset(150, 115), end: const Offset(246, 150)), weight: 1),
+      TweenSequenceItem(tween: Tween(begin: const Offset(246, 150), end: const Offset(278, 248)), weight: 1),
+      TweenSequenceItem(tween: Tween(begin: const Offset(278, 248), end: const Offset(240, 341)), weight: 1),
+      TweenSequenceItem(tween: Tween(begin: const Offset(240, 341), end: const Offset(146, 375)), weight: 1),
+      TweenSequenceItem(tween: Tween(begin: const Offset(146, 375), end: const Offset(55, 339)), weight: 1),
+      TweenSequenceItem(tween: Tween(begin: const Offset(55, 339), end: const Offset(20, 246)), weight: 1),
+      TweenSequenceItem(tween: Tween(begin: const Offset(20, 246), end: const Offset(51, 144)), weight: 1),
+      TweenSequenceItem(tween: Tween(begin: const Offset(51, 144), end: const Offset(150, 115)), weight: 1),
+    ]).animate(_controller);
+
+    _controller.repeat();
   }
+
+
+
+@override
+void dispose() {
+  _controller.dispose(); // Dispose of the animation controller
+  // _audioPlayer.dispose(); // Dispose of the audio player
+  super.dispose();
+}
 
   Future<void> _playMusic() async {
     await _audioPlayer.setSource(AssetSource('background-music.mp3')); // Set the source again
@@ -234,6 +264,8 @@ class MainGameScreen extends StatefulWidget {
 
             child: Stack(
               children: [
+
+
                 //win button in top bar
                 Positioned(
                   top: 36,
@@ -282,6 +314,7 @@ class MainGameScreen extends StatefulWidget {
                 ),
                // MORE MENU BUTTON
                 // Bet history button
+                //'assets/more-menu-btn.png',
                 Positioned(
                   top: 36,
                   left: 280,
@@ -294,10 +327,14 @@ class MainGameScreen extends StatefulWidget {
                         },
                       );
                     },
-                    child: Image.asset(
-                      'assets/more-menu-btn.png',
-                      width: 50,
-                      height: 35,
+                    child: AnimatedScale(
+                      scale: _scale,
+                      duration: _animationDuration,
+                      child: Image.asset(
+                        'assets/more-menu-btn.png',
+                        width: 50,
+                        height: 35,
+                      ),
                     ),
                   ),
                 ),
@@ -572,6 +609,20 @@ class MainGameScreen extends StatefulWidget {
                     left: 70,
                     child: Text('5 TIMES' , style: TextStyle(fontWeight: FontWeight.bold , color: Colors.black , fontSize: 14),)
                 ),
+                AnimatedBuilder(
+                  animation: _animation,
+                  builder: (context, child) {
+                    return Positioned(
+                      top: _animation.value.dy,
+                      left: _animation.value.dx,
+                      child: Image.asset(
+                        'assets/hand.png', // Replace with your hand image asset
+                        width: 70,
+                        height: 60,
+                      ),
+                    );
+                  },
+                ),
                 //pizza
                 Positioned(
                   top: 440,
@@ -728,7 +779,7 @@ class MainGameScreen extends StatefulWidget {
                   top: 560,
                   left: 285,
                   child: Image.asset(
-                    'assets/coin.png',
+                    'assets/diamond1.png',
                     width: 40,
                     height:22,
                   ),
@@ -753,7 +804,7 @@ class MainGameScreen extends StatefulWidget {
                   top: 767,
                   left: 278,
                   child: Image.asset(
-                    'assets/coin.png',
+                    'assets/diamond1.png',
                     width: 40,
                     height:22,
                   ),
